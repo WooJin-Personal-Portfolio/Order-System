@@ -14,10 +14,14 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 	private final EntityManager em;
 
 	@Override
-	public List<Order> findAllByString(OrderSearch orderSearch) {
+	public List<Order> findOrders(OrderSearch orderSearch) {
+		return findAllByString(orderSearch);
+	}
 
-        return em.createQuery("SELECT o FROM Order o WHERE o.status = :status", Order.class)
-                .setParameter("status", orderSearch.getOrderStatus())
-                .getResultList();
+	@Override
+	public List<Order> findAllByString(OrderSearch orderSearch) {
+		return em.createQuery("SELECT o FROM Order o WHERE o.status = :status", Order.class)
+				.setParameter("status", orderSearch.getOrderStatus())
+				.getResultList();
 	}
 }

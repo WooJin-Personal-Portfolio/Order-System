@@ -1,59 +1,68 @@
 package com.jwj.order.controller;
 
-import com.jwj.order.domain.Member;
 import com.jwj.order.domain.Order;
-import com.jwj.order.domain.item.Item;
+import com.jwj.order.dto.OrderCanceledRequest;
+import com.jwj.order.dto.OrderCreateRequest;
+import com.jwj.order.dto.OrderDto;
+import com.jwj.order.rabbitmq.OrderPublisher;
+import com.jwj.order.repository.OrderRepository;
 import com.jwj.order.repository.OrderSearch;
-import com.jwj.order.service.ItemService;
-import com.jwj.order.service.MemberService;
 import com.jwj.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class OrderController {
 
-    private final OrderService orderService;
-    private final MemberService memberService;
-    private final ItemService itemService;
+    private final OrderPublisher orderPublisher;
+    private final OrderRepository orderRepository;
 
-    @GetMapping("/order")
-    public String createForm(Model model) {
+    // 주문 생성 REST API
+    @PostMapping("/orders")
+    public ResponseEntity<Long> order(@RequestBody OrderCreateRequest request) {
 
-        List<Member> members = memberService.findMembers();
-        List<Item> items = itemService.findItems();
+        // 주문 시 메시지를 발행
+        orderPublisher.publishOrderCreatedEvent(request);
 
-        model.addAttribute("members", members);
-        model.addAttribute("items", items);
-
-        return "order/orderForm";
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .build();
     }
 
-    @PostMapping("/order")
-    public String order(@RequestParam("memberId") Long memberId,
-                        @RequestParam("itemId") Long itemId,
-                        @RequestParam("count") int count) {
-
-        orderService.order(memberId, itemId, count);
-        return "redirect:/orders";
-    }
-
+    // 주문 필터링 조회 REST API
     @GetMapping("/orders")
-    public String orderList(@ModelAttribute("orderSearch") OrderSearch orderSearch, Model model) {
-        List<Order> orders = orderService.findOrders(orderSearch);
-        model.addAttribute("orders", orders);
+    public ResponseEntity<List<OrderDto>> orderList(@RequestBody OrderSearch orderSearch) {
+        // 엔티티 리스트 조회
+        List<Order> orders = orderRepository.findOrders(orderSearch);
 
-        return "order/orderList";
+        // DTO로 변환
+        List<OrderDto> result = orders.stream()
+                .map(order -> new OrderDto(order))
+                .collect(Collectors.toList());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(result);
     }
 
-    @PostMapping("/orders/{orderId}/cancel")
-    public String cancelOrder(@PathVariable("orderId") Long orderId) {
-        orderService.cancelOrder(orderId);
-        return "redirect:/orders";
+    // 주문 취소 REST API
+    @DeleteMapping("/orders/{orderId}/cancel")
+    public ResponseEntity<Void> cancelOrder(@PathVariable("orderId") Long orderId) {
+
+        // 주문 취소 DTO
+        OrderCanceledRequest request = new OrderCanceledRequest(orderId);
+
+        // 주문 취소 시 메시지를 발행
+        orderPublisher.publishOrderCanceledEvent(request);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
     }
 }

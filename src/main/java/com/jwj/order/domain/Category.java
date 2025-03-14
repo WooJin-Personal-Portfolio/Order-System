@@ -1,6 +1,5 @@
 package com.jwj.order.domain;
 
-import com.jwj.order.domain.item.Item;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

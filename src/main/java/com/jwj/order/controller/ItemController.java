@@ -1,73 +1,40 @@
 package com.jwj.order.controller;
 
-import com.jwj.order.domain.item.Book;
-import com.jwj.order.domain.item.Item;
+import com.jwj.order.domain.Item;
+import com.jwj.order.dto.ItemCreateRequest;
+import com.jwj.order.repository.ItemRepository;
 import com.jwj.order.service.ItemService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
 public class ItemController {
 
     private final ItemService itemService;
+    private final ItemRepository itemRepository;
 
-    @GetMapping("/items/new")
-    public String createForm(Model model) {
-        model.addAttribute("form", new BookForm());
-        return "items/createItemForm";
-    }
-
+    // 상품 생성 REST API
     @PostMapping("/items/new")
-    public String create(BookForm form) {
+    public ResponseEntity<Void> create(@RequestBody ItemCreateRequest request) {
 
-        Book book = new Book();
-        book.setName(form.getName());
-        book.setPrice(form.getPrice());
-        book.setStockQuantity(form.getStockQuantity());
-        book.setAuthor(form.getAuthor());
-        book.setIsbn(form.getIsbn());
-
-        itemService.saveItem(book);
-        return "redirect:/";
+        itemService.saveItem(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .build();
     }
 
-    @GetMapping("/items")
-    public String list(Model model) {
-        List<Item> items = itemService.findItems();
-        model.addAttribute("items", items);
-        return "items/itemList";
-    }
+    // 상품 목록 조회 REST API
+    @GetMapping("/items/{itemId}")
+    public ResponseEntity<Item> list(@PathVariable("itemId") Long itemId) {
 
-    @GetMapping("items/{itemId}/edit")
-    public String updateItemForm(@PathVariable("itemId") Long itemId, Model model) {
-        Book item = (Book) itemService.findOne(itemId);
-
-        BookForm form = new BookForm();
-        form.setId(item.getId());
-        form.setName(item.getName());
-        form.setPrice(item.getPrice());
-        form.setStockQuantity(item.getStockQuantity());
-        form.setAuthor(item.getAuthor());
-        form.setIsbn(item.getIsbn());
-
-        model.addAttribute("form", form);
-        return "items/updateItemForm";
-    }
-
-    @PostMapping("items/{itemId}/edit")
-    public String updateItem(@PathVariable("itemId") Long itemId, @ModelAttribute("form") BookForm form) {
-
-        itemService.updateItem(itemId, form.getName(), form.getPrice(), form.getStockQuantity());
-
-        return "redirect:/items";
+        Item item = itemRepository.findById(itemId).orElse(null);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(item);
     }
 }
 
