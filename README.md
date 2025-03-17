@@ -130,9 +130,9 @@ src/
     - HTTP Request Failed : 0/s
 - 가상 사용자(VUs) 4000명 부하를 발생시켜 테스트한 결과
     - 데이터 정합성 : 정확하게 상품 하나의 수량이 4000개 감소
-    - TPS(Transaction Per Seconds) : 2.23k/s
+    - TPS(Transaction Per Seconds) : 2.23k/sec
     - Latency : 약 237ms
-    - HTTP Request Failed : 0%
+    - HTTP Request Failed : 0/s
 
 ![image](https://github.com/user-attachments/assets/aadf9fd0-ace5-4600-b6bd-86b66c6ff234)
 
