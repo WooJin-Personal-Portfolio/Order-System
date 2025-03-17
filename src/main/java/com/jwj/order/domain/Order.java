@@ -20,7 +20,7 @@ import static jakarta.persistence.FetchType.LAZY;
 public class Order {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Long id;
 
@@ -84,8 +84,6 @@ public class Order {
         for (OrderItem orderItem : orderItems) {
             orderItem.cancel();
         }
-
-        
     }
 
     //==조회 로직==//
@@ -99,5 +97,4 @@ public class Order {
         }
         return totalPrice;
     }
-
 }
