@@ -6,5 +6,7 @@ import java.util.List;
 
 public interface OrderRepositoryCustom {
 
+	List<Order> findOrders(OrderSearch orderSearch);
 	List<Order> findAllByString(OrderSearch orderSearch);
+
 }

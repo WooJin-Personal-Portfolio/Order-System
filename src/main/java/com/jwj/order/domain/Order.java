@@ -20,7 +20,7 @@ import static jakarta.persistence.FetchType.LAZY;
 public class Order {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Long id;
 
@@ -59,7 +59,7 @@ public class Order {
     }
 
     //==생성 메서드==//
-    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) {
+    public static Order createOrder(Member member, Delivery delivery, List<OrderItem> orderItems) {
         Order order = new Order();
         order.setMember(member);
         order.setDelivery(delivery);
@@ -97,5 +97,4 @@ public class Order {
         }
         return totalPrice;
     }
-
 }

@@ -1,22 +1,20 @@
-package com.jwj.order.domain.item;
+package com.jwj.order.domain;
 
-import com.jwj.order.domain.Category;
+import com.jwj.order.dto.ItemCreateRequest;
 import com.jwj.order.exception.NotEnoughStockException;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "dtype")
 @Getter @Setter
-public abstract class Item {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Item {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_id")
     private Long id;
 
@@ -37,5 +35,20 @@ public abstract class Item {
             throw new NotEnoughStockException("need more stock");
         }
         this.stockQuantity = restStock;
+    }
+
+    @Builder
+    private Item(String name, int price, int stockQuantity) {
+        this.name = name;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+    }
+
+    public static Item toEntity(ItemCreateRequest request) {
+        return Item.builder()
+                .name(request.getName())
+                .price(request.getPrice())
+                .stockQuantity(request.getStockQuantity())
+                .build();
     }
 }

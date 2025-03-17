@@ -1,7 +1,6 @@
 package com.jwj.order.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jwj.order.domain.item.Item;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -45,7 +44,7 @@ public class OrderItem {
 
     //==비즈니스 로직==//
     public void cancel() {
-        getItem().addStock(count);
+        getItem().addStock(this.count);
     }
 
     //==조회 로직==//

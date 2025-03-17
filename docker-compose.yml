@@ -1,13 +1,12 @@
 services:
   rabbitmq:
-    image: rabbitmq:management-alpine
+    image: rabbitmq:3.12.11-management
     container_name: rabbit-mq-container
     hostname: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
     environment:
-      - RABBITMQ_ERLANG_COOKIE=rabbitmqCookie
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
 
