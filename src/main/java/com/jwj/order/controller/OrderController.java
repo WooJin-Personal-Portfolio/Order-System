@@ -22,6 +22,7 @@ public class OrderController {
 
     private final OrderPublisher orderPublisher;
     private final OrderRepository orderRepository;
+    private final OrderService orderService;
 
     // 주문 생성 REST API
     @PostMapping("/orders")
@@ -55,11 +56,8 @@ public class OrderController {
     @DeleteMapping("/orders/{orderId}/cancel")
     public ResponseEntity<Void> cancelOrder(@PathVariable("orderId") Long orderId) {
 
-        // 주문 취소 DTO
-        OrderCanceledRequest request = new OrderCanceledRequest(orderId);
-
-        // 주문 취소 시 메시지를 발행
-        orderPublisher.publishOrderCanceledEvent(request);
+        // 주문 취소
+        orderService.cancelOrder(orderId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
