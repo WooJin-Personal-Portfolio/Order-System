@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMqConfig {
 
+	private static final int DEFAULT_MESSAGE_TTL = 60000;	// 1분
+
 	public static final String ORDER_EXCHANGE = "ORDER_EXCHANGE";			// 주문 익스체인지
 	public static final String ORDER_QUEUE = "ORDER_QUEUE";					// 주문 대기열
 	public static final String ORDER_ROUTING_KEY = "ORDER_CREATED";			// 주문 라우팅 키
@@ -89,6 +91,7 @@ public class RabbitMqConfig {
 		return QueueBuilder.durable(ORDER_QUEUE)
 				.withArgument("x-dead-letter-exchange", DEADLETTER_EXCHANGE)
 				.withArgument("x-dead-letter-routing-key", DEADLETTER_ROUTING_KEY)
+				.withArgument("x-message-ttl", DEFAULT_MESSAGE_TTL)
 				.build();
 	}
 
